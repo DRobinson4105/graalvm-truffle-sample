@@ -15,43 +15,32 @@ public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
 
     @Specialization(guards = "frame.isInt(getFrameSlot())")
     protected int readInt(VirtualFrame frame) {
-        return frame.getInt(this.getFrameSlot());
+        return (int) findValue(frame, currFrame -> currFrame.getInt(this.getFrameSlot()));
     }
 
     @Specialization(replaces = "readInt", guards = "frame.isDouble(getFrameSlot())")
     protected double readDouble(VirtualFrame frame) {
-        return frame.getDouble(this.getFrameSlot());
+        return (double) findValue(frame, currFrame -> currFrame.getDouble(this.getFrameSlot()));
     }
 
     @Specialization(guards = "frame.isBoolean(getFrameSlot())")
     protected boolean readBool(VirtualFrame frame) {
-        return frame.getBoolean(this.getFrameSlot());
+        return (boolean) findValue(frame, currFrame -> currFrame.getBoolean(this.getFrameSlot()));
     }
 
     @Specialization(replaces = {"readInt", "readDouble", "readBool"})
     protected Object readObject(VirtualFrame frame) {
-        Object res;
-        while (frame != null) {
-            res = frame.getObject(this.getFrameSlot());
-            if (res != null)
-                return res;
-
-            if (frame.getArguments().length == 0)
-                throw new EasyScriptException(this, "this variable is not defined");
-            frame = (VirtualFrame) frame.getArguments()[0];
-        }
-
-        throw new EasyScriptException(this, "this variable is not defined");
+        return findValue(frame, currFrame -> currFrame.getObject(this.getFrameSlot()));
     }
 
-//    private Object findValue(VirtualFrame frame, Function<VirtualFrame, Object> valueReceiver) {
-//        var res = valueReceiver.apply(frame);
-//        if (res != null)
-//            return res;
-//
-//        if (frame.getArguments().length == 0)
-//            throw new EasyScriptException(this, "this variable is not defined");
-//
-//        return findValue((VirtualFrame) frame.getArguments()[0], valueReceiver);
-//    }
+    private Object findValue(VirtualFrame frame, Function<VirtualFrame, Object> valueReceiver) {
+        var res = valueReceiver.apply(frame);
+        if (res != null)
+            return res;
+
+        if (frame.getArguments().length == 0)
+            throw new EasyScriptException(this, "this variable is not defined");
+
+        return findValue((VirtualFrame) frame.getArguments()[0], valueReceiver);
+    }
 }
