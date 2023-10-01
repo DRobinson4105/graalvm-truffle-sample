@@ -45,8 +45,6 @@ public abstract class LocalVarAssignmentExprNode extends EasyScriptExprNode {
 
     @Specialization(replaces = {"intAssignment", "doubleAssignment", "boolAssignment"})
     protected Object objectAssignment(VirtualFrame frame, Object value) {
-        System.out.println("assign->" + frame);
-        System.out.println(this.getFrameSlot() + ":" + value);
         var frameSlot = this.getFrameSlot();
         frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
         frame.setObject(frameSlot, value);

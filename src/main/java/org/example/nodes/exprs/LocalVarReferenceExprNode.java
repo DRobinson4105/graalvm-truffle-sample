@@ -3,6 +3,11 @@ package org.example.nodes.exprs;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import org.example.EasyScriptException;
+
+import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @NodeField(name = "frameSlot", type = int.class)
 public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
@@ -25,12 +30,28 @@ public abstract class LocalVarReferenceExprNode extends EasyScriptExprNode {
 
     @Specialization(replaces = {"readInt", "readDouble", "readBool"})
     protected Object readObject(VirtualFrame frame) {
-        System.out.println("ref->" + frame);
-        System.out.println(this.getFrameSlot());
-        var res = frame.getObject(this.getFrameSlot());
-        if (res == null)
-            res = this.currentLanguageContext().evaluatorEnvironment.closureFrame.getObject(this.getFrameSlot());
-        System.out.println(res);
-        return res;
+        Object res;
+        while (frame != null) {
+            res = frame.getObject(this.getFrameSlot());
+            if (res != null)
+                return res;
+
+            if (frame.getArguments().length == 0)
+                throw new EasyScriptException(this, "this variable is not defined");
+            frame = (VirtualFrame) frame.getArguments()[0];
+        }
+
+        throw new EasyScriptException(this, "this variable is not defined");
     }
+
+//    private Object findValue(VirtualFrame frame, Function<VirtualFrame, Object> valueReceiver) {
+//        var res = valueReceiver.apply(frame);
+//        if (res != null)
+//            return res;
+//
+//        if (frame.getArguments().length == 0)
+//            throw new EasyScriptException(this, "this variable is not defined");
+//
+//        return findValue((VirtualFrame) frame.getArguments()[0], valueReceiver);
+//    }
 }

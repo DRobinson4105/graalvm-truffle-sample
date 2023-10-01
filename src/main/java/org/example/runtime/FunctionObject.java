@@ -19,17 +19,19 @@ public final class FunctionObject implements TruffleObject {
     public CallTarget callTarget;
     public int argumentCount;
     public final Object methodTarget;
-    public final VirtualFrame parentFrame;
+    public VirtualFrame enclosingFrame = null;
 
-    public FunctionObject(CallTarget callTarget, int argumentCount, VirtualFrame parentFrame) {
-        this(callTarget, argumentCount, null, parentFrame);
-    }
-    public FunctionObject(CallTarget callTarget, int argumentCount, Object methodTarget, VirtualFrame parentFrame) {
+    public FunctionObject(CallTarget callTarget, int argumentCount, Object methodTarget) {
         this.functionDispatchNode = FunctionDispatchNodeGen.create();
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
         this.methodTarget = methodTarget;
-        this.parentFrame = parentFrame;
+    }
+
+    public FunctionObject(CallTarget callTarget, int argumentCount, Object methodTarget, VirtualFrame enclosingFrame) {
+        this(callTarget, argumentCount, methodTarget);
+        if (enclosingFrame != null)
+            this.enclosingFrame = enclosingFrame.materialize();
     }
 
     @ExportMessage

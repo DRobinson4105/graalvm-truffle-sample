@@ -36,17 +36,17 @@ public class FunctionCallExprNode extends EasyScriptExprNode {
         this.dispatchNode = FunctionDispatchNodeGen.create();
     }
 
-
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
         Object function = this.targetFunction.executeGeneric(frame);
 
         if (function instanceof FunctionObject functionObject) {
-            Object[] argumentValues = new Object[this.callArguments.length];
+            Object[] argumentValues = new Object[this.callArguments.length + 1];
 
+            argumentValues[0] = functionObject.enclosingFrame;
             for (int i = 0; i < this.callArguments.length; i++) {
-                argumentValues[i] = this.callArguments[i].executeGeneric(frame);
+                argumentValues[i + 1] = this.callArguments[i].executeGeneric(frame);
             }
 
             argumentValues = extendedArguments(argumentValues, functionObject);
@@ -57,24 +57,14 @@ public class FunctionCallExprNode extends EasyScriptExprNode {
         throw new EasyScriptException(this, "'" + function + "' is not a function");
     }
 
-    private static Object[] extendedArguments(Object[] arguments, FunctionObject function) {
-        if (arguments.length >= function.argumentCount && function.methodTarget == null) {
+    private Object[] extendedArguments(Object[] arguments, FunctionObject function) {
+        if (arguments.length >= function.argumentCount) {
             return arguments;
         }
-        Object[] ret = new Object[function.argumentCount];
-        for (int i = 0; i < function.argumentCount; i++) {
-            int j;
-            if (function.methodTarget == null) {
-                j = i;
-            } else {
-                if (i == 0) {
-                    ret[0] = function.methodTarget;
-                    continue;
-                } else {
-                    j = i - 1;
-                }
-            }
-            ret[i] = j < arguments.length ? arguments[j] : Undefined.INSTANCE;
+
+        Object[] ret = new Object[function.argumentCount + 1];
+        for (int i = 0; i < function.argumentCount + 1; i++) {
+            ret[i + 1] = i < arguments.length ? arguments[i] : Undefined.INSTANCE;
         }
         return ret;
     }

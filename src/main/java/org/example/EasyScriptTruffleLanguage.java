@@ -73,6 +73,7 @@ public final class EasyScriptTruffleLanguage extends
         return new FunctionObject(
                 builtInFuncRootNode.getCallTarget(),
                 functionArguments.length,
+                null,
                 null
         );
     }
@@ -91,10 +92,5 @@ public final class EasyScriptTruffleLanguage extends
         var rootNode = new BuiltInFuncRootNode(this, nodeFactory.createNode((Object) functionArguments));
 
         return rootNode.getCallTarget();
-    }
-
-    @Override
-    protected Object getScope(EasyScriptLanguageContext context) {
-        return context.globalScopeObject;
     }
 }

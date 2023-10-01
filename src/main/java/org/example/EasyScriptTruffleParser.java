@@ -58,7 +58,6 @@ public final class EasyScriptTruffleParser {
     private FrameDescriptor.Builder frameDescriptor;
     private Stack<Map<String, FrameMember>> localScopes;
     private final Shape arrayShape;
-    private int argumentCount;
 
     private FrameMember findFrameMember(String memberName) {
         FrameMember ret;
@@ -269,7 +268,7 @@ public final class EasyScriptTruffleParser {
     }
     private EasyScriptExprNode parseExpr2(Expr2Context expr2) {
         if (expr2 instanceof EqNotEqExpr2Context eqNotEqExpr)
-                return parseEqNotEqExpr(eqNotEqExpr);
+            return parseEqNotEqExpr(eqNotEqExpr);
         else
             return parseExpr3(((PrecedenceThreeExpr2Context) expr2).expr3());
     }
@@ -382,14 +381,11 @@ public final class EasyScriptTruffleParser {
     }
 
     private ClosureLiteralExprNode parseClosureLiteralExpr(ClosureLiteralExpr5Context closureLiteralExpr) {
-        var previousArgumentCount = this.argumentCount;
-
         var functionArguments = new HashMap<String, FrameMember>();
         List<TerminalNode> funcArgs = closureLiteralExpr.args.ID();
-        this.argumentCount = funcArgs.size();
 
-        for (int i = 0; i < this.argumentCount; i++) {
-            functionArguments.put(funcArgs.get(i).getText(), new FunctionArgument(i));
+        for (int i = 0; i < funcArgs.size(); i++) {
+            functionArguments.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
         }
 
         this.localScopes.push(functionArguments);
@@ -398,15 +394,11 @@ public final class EasyScriptTruffleParser {
 
         FrameDescriptor frameDescriptor = this.frameDescriptor.build();
 
-        var node = new ClosureLiteralExprNode(
+        return new ClosureLiteralExprNode(
                 frameDescriptor,
                 new UserFuncBodyStmtNode(funcStmts),
-                this.argumentCount
+                funcArgs.size()
         );
-
-        this.argumentCount = previousArgumentCount;
-
-        return node;
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
