@@ -11,6 +11,7 @@ import org.example.nodes.exprs.EasyScriptExprNode;
 import org.example.runtime.Undefined;
 
 public class DoWhileStmtNode extends EasyScriptStmtNode {
+    @SuppressWarnings("FieldMayBeFinal")
     @Child private LoopNode loopNode;
 
     public DoWhileStmtNode(EasyScriptExprNode condition, EasyScriptStmtNode body) {
@@ -39,7 +40,8 @@ public class DoWhileStmtNode extends EasyScriptStmtNode {
             try {
                 this.body.executeStatement(frame);
             } catch (ControlFlowException stop) {
-                if (stop instanceof DirectBreakException) return false;
+                if (stop instanceof DirectBreakException)
+                    return false;
             }
 
             return this.condition.executeBool(frame);

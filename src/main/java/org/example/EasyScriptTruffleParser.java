@@ -8,7 +8,6 @@ import org.example.nodes.stmts.*;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -55,8 +54,8 @@ public final class EasyScriptTruffleParser {
             this.declarationKind = declarationKind;
         }
     }
-    private FrameDescriptor.Builder frameDescriptor;
-    private Stack<Map<String, FrameMember>> localScopes;
+    private final FrameDescriptor.Builder frameDescriptor;
+    private final Stack<Map<String, FrameMember>> localScopes;
     private final Shape arrayShape;
 
     private FrameMember findFrameMember(String memberName) {
@@ -277,9 +276,9 @@ public final class EasyScriptTruffleParser {
         EasyScriptExprNode left = parseExpr2(eqNotEqExpr.left);
         EasyScriptExprNode right = parseExpr3(eqNotEqExpr.right);
         if (eqNotEqExpr.c.getText().equals("==="))
-            return EqualToExprNodeGen.create(left, right);
+            return EqualityExprNodeGen.create(left, right);
         else
-            return NotEqualToExprNodeGen.create(left, right);
+            return InequalityExprNodeGen.create(left, right);
     }
 
     private EasyScriptExprNode parseExpr3(Expr3Context expr3) {
