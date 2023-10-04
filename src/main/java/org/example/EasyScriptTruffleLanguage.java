@@ -2,11 +2,10 @@ package org.example;
 
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
-import com.oracle.truffle.js.builtins.StringPrototypeBuiltins;
-import org.example.nodes.EasyScriptNode;
-import org.example.nodes.exprs.*;
+import org.example.nodes.expressions.functions.builtin.BuiltInFunctionBodyExprNode;
+import org.example.nodes.expressions.functions.builtin.CharAtMethodBodyExprNodeFactory;
+import org.example.nodes.expressions.functions.ReadFunctionArgExprNode;
 import org.example.nodes.roots.BuiltInFuncRootNode;
 import org.example.nodes.roots.StmtBlockRootNode;
 
@@ -14,7 +13,6 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.TruffleLanguage;
 import org.example.runtime.ArrayObject;
 import org.example.runtime.FunctionObject;
-import org.example.runtime.MathObject;
 
 import java.util.stream.IntStream;
 
@@ -73,7 +71,6 @@ public final class EasyScriptTruffleLanguage extends
         return new FunctionObject(
                 builtInFuncRootNode.getCallTarget(),
                 functionArguments.length,
-                null,
                 null
         );
     }

@@ -1,15 +1,26 @@
 package org.example;
 
 import com.oracle.truffle.api.object.Shape;
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.text.StringEscapeUtils;
-import org.example.nodes.exprs.*;
-import org.example.nodes.stmts.*;
-
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-
-import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.example.nodes.expressions.EasyScriptExprNode;
+import org.example.nodes.expressions.variables.*;
+import org.example.nodes.expressions.arithmetic.*;
+import org.example.nodes.expressions.arrays.*;
+import org.example.nodes.expressions.functions.*;
+import org.example.nodes.expressions.literals.*;
+import org.example.nodes.expressions.properties.*;
+import org.example.nodes.expressions.comparisons.*;
+import org.example.nodes.statements.EasyScriptStmtNode;
+import org.example.nodes.statements.ExprStmtNode;
+import org.example.nodes.statements.blocks.*;
+import org.example.nodes.statements.controlflow.*;
+import org.example.nodes.statements.loops.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -19,44 +30,45 @@ import java.util.stream.Collectors;
 import static org.example.EasyScriptParser.*;
 
 public final class EasyScriptTruffleParser {
-
     public static ParsingResult parse(Reader program, Shape arrayShape) throws IOException {
         var lexer = new EasyScriptLexer(CharStreams.fromReader(program));
-        // remove the default console error listener
         lexer.removeErrorListeners();
+
         var parser = new EasyScriptParser(new CommonTokenStream(lexer));
-        // remove the default console error listener
         parser.removeErrorListeners();
-        // throw an exception when a parsing error is encountered
         parser.setErrorHandler(new BailErrorStrategy());
 
         var easyScriptTruffleParser = new EasyScriptTruffleParser(arrayShape);
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
                 new UserFuncBodyStmtNode(stmts),
-                easyScriptTruffleParser.frameDescriptor.build()
+                easyScriptTruffleParser.frameDescriptorBuilder.build()
         );
     }
 
     private static abstract class FrameMember {
+        public int depth;
         public int index;
     }
     private static final class FunctionArgument extends FrameMember {
-        FunctionArgument(int argumentIndex) {
+        FunctionArgument(int argumentIndex, int depth) {
             this.index = argumentIndex;
+            this.depth = depth;
         }
     }
 
     private static final class LocalVariable extends FrameMember {
         public final DeclarationKind declarationKind;
-        LocalVariable(int variableIndex, DeclarationKind declarationKind) {
+        LocalVariable(int variableIndex, DeclarationKind declarationKind, int depth) {
             this.index = variableIndex;
             this.declarationKind = declarationKind;
+            this.depth = depth;
         }
     }
-    private final FrameDescriptor.Builder frameDescriptor;
+    private FrameDescriptor.Builder frameDescriptorBuilder;
     private final Stack<Map<String, FrameMember>> localScopes;
     private final Shape arrayShape;
+    private int currentDepth;
 
     private FrameMember findFrameMember(String memberName) {
         FrameMember ret;
@@ -81,10 +93,11 @@ public final class EasyScriptTruffleParser {
         return null;
     }
     private EasyScriptTruffleParser(Shape arrayShape) {
-        this.frameDescriptor = FrameDescriptor.newBuilder();
+        this.frameDescriptorBuilder = FrameDescriptor.newBuilder();
         this.localScopes = new Stack<>();
         this.localScopes.push(new HashMap<>());
         this.arrayShape = arrayShape;
+        this.currentDepth = 0;
     }
 
     private List<EasyScriptStmtNode> parseStmtsList(List<StmtContext> stmts) {
@@ -95,8 +108,8 @@ public final class EasyScriptTruffleParser {
                 for (BindingContext binding : varDeclStmt.binding()) {
                     DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
                     String variableId = binding.ID().getText();
-                    int frameSlot = this.frameDescriptor.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
-                    if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind)) != null) {
+                    int frameSlot = this.frameDescriptorBuilder.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
+                    if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind, currentDepth)) != null) {
                         throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
                     }
                 }
@@ -152,7 +165,7 @@ public final class EasyScriptTruffleParser {
                 initializerExpr = this.parseExpr1(bindingExpr);
             }
 
-            LocalVarAssignmentExprNode assignmentExpr = LocalVarAssignmentExprNodeGen.create(initializerExpr, frameMember.index);
+            VarAssignmentExprNode assignmentExpr = VarAssignmentExprNodeGen.create(initializerExpr, frameMember.index, this.currentDepth - frameMember.depth);
             return new ExprStmtNode(assignmentExpr, true);
         }
 
@@ -248,14 +261,14 @@ public final class EasyScriptTruffleParser {
             throw new EasyScriptException("'" + variableId + "' is not defined");
 
         if (frameMember instanceof FunctionArgument functionArgument) {
-            return new WriteFunctionArgExprNode(initializerExpr, functionArgument.index);
+            return new WriteFunctionArgExprNode(initializerExpr, functionArgument.index, this.currentDepth - frameMember.depth);
         }
 
         var localVariable = (LocalVariable) frameMember;
         if (localVariable.declarationKind == DeclarationKind.CONST)
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
 
-        return LocalVarAssignmentExprNodeGen.create(initializerExpr, localVariable.index);
+        return VarAssignmentExprNodeGen.create(initializerExpr, localVariable.index, this.currentDepth - frameMember.depth);
     }
 
     private ArrayIndexWriteExprNode parseArrayIndexWriteExpr(ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {
@@ -304,8 +317,8 @@ public final class EasyScriptTruffleParser {
     private EasyScriptExprNode parseExpr4(Expr4Context expr4) {
         if (expr4 instanceof AddSubtractExpr4Context addExpr)
             return parseAddSubtractExpr(addExpr);
-        else if (expr4 instanceof UnaryMinusExpr4Context unaryMinusExpr)
-            return parseUnaryMinusExpr(unaryMinusExpr);
+        else if (expr4 instanceof NegationExpr4Context negationExpr)
+            return parseUnaryMinusExpr(negationExpr);
         else
             return parseExpr5(((PrecedenceFiveExpr4Context) expr4).expr5());
     }
@@ -321,8 +334,8 @@ public final class EasyScriptTruffleParser {
         };
     }
 
-    private UnaryMinusExprNode parseUnaryMinusExpr(UnaryMinusExpr4Context negExpr) {
-        return UnaryMinusExprNodeGen.create(parseExpr5(negExpr.expr5()));
+    private NegationExprNode parseUnaryMinusExpr(NegationExpr4Context negExpr) {
+        return NegationExprNodeGen.create(parseExpr5(negExpr.expr5()));
     }
 
     private EasyScriptExprNode parseExpr5(Expr5Context expr5) {
@@ -380,18 +393,25 @@ public final class EasyScriptTruffleParser {
     }
 
     private ClosureLiteralExprNode parseClosureLiteralExpr(ClosureLiteralExpr5Context closureLiteralExpr) {
+        this.currentDepth++;
+        FrameDescriptor.Builder previousFrameDescriptorBuilder = this.frameDescriptorBuilder;
+        this.frameDescriptorBuilder = FrameDescriptor.newBuilder();
+
         var functionArguments = new HashMap<String, FrameMember>();
         List<TerminalNode> funcArgs = closureLiteralExpr.args.ID();
 
         for (int i = 0; i < funcArgs.size(); i++) {
-            functionArguments.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1));
+            functionArguments.put(funcArgs.get(i).getText(), new FunctionArgument(i + 1, this.currentDepth));
         }
 
         this.localScopes.push(functionArguments);
-        List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(closureLiteralExpr.stmt());
-        this.localScopes.pop();
 
-        FrameDescriptor frameDescriptor = this.frameDescriptor.build();
+        List<EasyScriptStmtNode> funcStmts = this.parseStmtsList(closureLiteralExpr.stmt());
+        FrameDescriptor frameDescriptor = this.frameDescriptorBuilder.build();
+
+        this.localScopes.pop();
+        this.currentDepth--;
+        this.frameDescriptorBuilder = previousFrameDescriptorBuilder;
 
         return new ClosureLiteralExprNode(
                 frameDescriptor,
@@ -406,9 +426,9 @@ public final class EasyScriptTruffleParser {
         if (frameMember == null) {
             throw new EasyScriptException("'" + variableId + "' is not defined");
         } else if (frameMember instanceof FunctionArgument) {
-            return new ReadFunctionArgExprNode(frameMember.index);
+            return new ReadFunctionArgExprNode(frameMember.index, this.currentDepth - frameMember.depth);
         } else {
-            return LocalVarReferenceExprNodeGen.create(frameMember.index);
+            return VarReferenceExprNodeGen.create(frameMember.index, this.currentDepth - frameMember.depth);
         }
     }
 

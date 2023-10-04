@@ -11,18 +11,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestRunner {
-    public static void run() {
-        String fileName = "/Users/drobinson/IdeaProjects/GraalVMLearning/src/test/java/org/example/input.txt";
+
+
+
+    public static Value runString(String code){
+        Context context = Context.create();
+        Value result = context.eval("ezs", code);
+        return result;
+    }
+
+    public static Value runInline(String code){
+        return runString(code.stripIndent());
+    }
+
+    public static Value runTestFile(String name){
+        String fileName = "/Users/drobinson/IdeaProjects/GraalVMLearning/src/test/java/org/example/" + name;
         String content;
         try {
             content = new String(Files.readAllBytes(Paths.get(fileName)));
         } catch (IOException e) {
-            content = "0";
+            throw new RuntimeException(e);
         }
-        Context context = Context.create();
-        Value result = context.eval("ezs",
-            content
-        );
-        assertEquals(5, result.asInt());
+        return runString(content);
     }
 }

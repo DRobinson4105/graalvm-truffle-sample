@@ -1,9 +1,10 @@
 const outer = (x) => {
+    let h = 0;
     const inner = (y) => {
-        return x + y;
+        return x + y + h;
     }
-
+    h = 1;
     return inner;
 }
 
-return outer(2)(3);
+return outer(2)(3)

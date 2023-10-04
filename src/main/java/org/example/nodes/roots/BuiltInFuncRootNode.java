@@ -3,7 +3,7 @@ package org.example.nodes.roots;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import org.example.EasyScriptTruffleLanguage;
-import org.example.nodes.exprs.BuiltInFunctionBodyExprNode;
+import org.example.nodes.expressions.functions.builtin.BuiltInFunctionBodyExprNode;
 
 public final class BuiltInFuncRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")

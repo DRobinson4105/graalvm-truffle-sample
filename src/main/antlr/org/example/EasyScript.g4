@@ -35,7 +35,7 @@ expr3 : left=expr3 c=('<' | '<=' | '>' | '>=') right=expr4 #ComparisonExpr3
       ;
 
 expr4 : left=expr4 o=('+' | '-') right=expr5               #AddSubtractExpr4
-      | '-' expr5                                          #UnaryMinusExpr4
+      | '-' expr5                                          #NegationExpr4
       | expr5                                              #PrecedenceFiveExpr4
       ;
 

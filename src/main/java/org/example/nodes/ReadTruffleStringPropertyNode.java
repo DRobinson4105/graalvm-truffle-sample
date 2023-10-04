@@ -51,7 +51,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     }
 
     protected FunctionObject createCharAtMethodObject(TruffleString truffleString) {
-        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod(), 2, truffleString, null);
+        return new FunctionObject(currentLanguageContext().stringPrototype.charAtMethod(), 2, truffleString);
     }
 
     @Fallback

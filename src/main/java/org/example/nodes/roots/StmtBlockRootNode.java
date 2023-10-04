@@ -1,13 +1,13 @@
 package org.example.nodes.roots;
 
 import org.example.EasyScriptTruffleLanguage;
-import org.example.nodes.stmts.BlockStmtNode;
+import org.example.nodes.statements.blocks.BlockStmtNode;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
-import org.example.nodes.stmts.EasyScriptStmtNode;
-import org.example.nodes.stmts.UserFuncBodyStmtNode;
+import org.example.nodes.statements.EasyScriptStmtNode;
+import org.example.nodes.statements.blocks.UserFuncBodyStmtNode;
 
 public final class StmtBlockRootNode extends RootNode {
     @SuppressWarnings("FieldMayBeFinal")
