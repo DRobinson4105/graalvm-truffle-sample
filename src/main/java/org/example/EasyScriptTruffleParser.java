@@ -315,22 +315,25 @@ public final class EasyScriptTruffleParser {
     }
 
     private EasyScriptExprNode parseExpr4(Expr4Context expr4) {
-        if (expr4 instanceof AddSubtractExpr4Context addExpr)
-            return parseAddSubtractExpr(addExpr);
+        if (expr4 instanceof ArithmeticExpr4Context addExpr)
+            return parseArithmeticExpr(addExpr);
         else if (expr4 instanceof NegationExpr4Context negationExpr)
             return parseUnaryMinusExpr(negationExpr);
         else
             return parseExpr5(((PrecedenceFiveExpr4Context) expr4).expr5());
     }
 
-    private EasyScriptExprNode parseAddSubtractExpr(AddSubtractExpr4Context addSubtractExpr) {
-        EasyScriptExprNode left = parseExpr4(addSubtractExpr.left);
-        EasyScriptExprNode right = parseExpr5(addSubtractExpr.right);
+    private EasyScriptExprNode parseArithmeticExpr(ArithmeticExpr4Context arithmeticExpr) {
+        EasyScriptExprNode left = parseExpr4(arithmeticExpr.left);
+        EasyScriptExprNode right = parseExpr5(arithmeticExpr.right);
 
-        return switch (addSubtractExpr.o.getText()) {
+        return switch (arithmeticExpr.o.getText()) {
             case "+" -> AdditionExprNodeGen.create(left, right);
             case "-" -> SubtractionExprNodeGen.create(left, right);
-            default -> throw new EasyScriptException("Unexpected value: " + addSubtractExpr.o.getText());
+            case "*" -> MultiplicationExprNodeGen.create(left, right);
+            case "/" -> DivisionExprNodeGen.create(left, right);
+            case "%" -> ModExprNodeGen.create(left, right);
+            default -> throw new EasyScriptException("Unexpected value: " + arithmeticExpr.o.getText());
         };
     }
 

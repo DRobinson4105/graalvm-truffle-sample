@@ -286,4 +286,27 @@ public class Tests {
                 """).asInt()
         );
     }
+
+    @Test public void caseArithmetic() {
+        assertEquals(5, runInline("""
+                return 2 + 3
+                """).asInt()
+        );
+        assertEquals(5, runInline("""
+                return 8 - 3
+                """).asInt()
+        );
+        assertEquals(6, runInline("""
+                return 2 * 3
+                """).asInt()
+        );
+        assertEquals(5, runInline("""
+                return 10 / 2
+                """).asInt()
+        );
+        assertEquals(2, runInline("""
+                return 8 % 3
+                """).asInt()
+        );
+    }
 }
