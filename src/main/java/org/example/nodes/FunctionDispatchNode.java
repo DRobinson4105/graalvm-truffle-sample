@@ -1,6 +1,5 @@
 package org.example.nodes;
 
-import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -9,8 +8,12 @@ import com.oracle.truffle.api.nodes.IndirectCallNode;
 import com.oracle.truffle.api.nodes.Node;
 import org.example.EasyScriptException;
 import org.example.runtime.FunctionObject;
-import org.example.runtime.Undefined;
+import org.example.nodes.expressions.functions.FunctionCallExprNode;
 
+/**
+ * Allows specialization for {@link FunctionCallExprNode}, caching the call target
+ * and inlining the function call if the call target hasn't changed
+ */
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 
