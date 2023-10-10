@@ -1,8 +1,8 @@
 package org.example.nodes.statements;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.runtime.Undefined;
 
 public final class ExprStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
@@ -21,6 +21,6 @@ public final class ExprStmtNode extends EasyScriptStmtNode {
     @Override
     public Object executeStatement(VirtualFrame frame) {
         Object exprResult = this.expr.executeGeneric(frame);
-        return this.discardExpressionValue ? Undefined.INSTANCE : exprResult;
+        return this.discardExpressionValue ? Undefined.instance : exprResult;
     }
 }

@@ -11,13 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestRunner {
-
-
-
     public static Value runString(String code){
         Context context = Context.create();
-        Value result = context.eval("ezs", code);
-        return result;
+        return context.eval("ezs", code);
     }
 
     public static Value runInline(String code){

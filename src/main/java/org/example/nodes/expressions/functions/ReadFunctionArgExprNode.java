@@ -2,8 +2,8 @@ package org.example.nodes.expressions.functions;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.runtime.Undefined;
 
 public class ReadFunctionArgExprNode extends EasyScriptExprNode {
     private final int index;
@@ -29,10 +29,10 @@ public class ReadFunctionArgExprNode extends EasyScriptExprNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
-        // Traverse to frame containing the argument
+        // traverse to frame containing the argument
         frame = getFrame(frame);
 
         Object[] arguments = frame.getArguments();
-        return this.index < arguments.length ? arguments[this.index] : Undefined.INSTANCE;
+        return this.index < arguments.length ? arguments[this.index] : Undefined.instance;
     }
 }

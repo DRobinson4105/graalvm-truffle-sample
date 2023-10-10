@@ -1,5 +1,6 @@
 package org.example.nodes.expressions.functions;
 
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.nodes.FunctionDispatchNode;
 import org.example.nodes.FunctionDispatchNodeGen;
@@ -7,8 +8,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.runtime.FunctionObject;
-import org.example.runtime.Undefined;
-
 import java.util.List;
 
 public class FunctionCallExprNode extends EasyScriptExprNode {
@@ -34,19 +33,20 @@ public class FunctionCallExprNode extends EasyScriptExprNode {
         Object function = this.targetFunction.executeGeneric(frame);
 
         if (function instanceof FunctionObject functionObject) {
+            int infoVal = 1;
             Object[] argumentValues = new Object[this.callArguments.length + 1];
 
-            // Add
             if (functionObject.isClosure)
                 argumentValues[0] = functionObject.enclosingFrame;
-            else
+            else if (functionObject.methodTarget != null)
                 argumentValues[0] = functionObject.methodTarget;
+            else
+                infoVal = 0;
 
             for (int i = 0; i < this.callArguments.length; i++)
-                argumentValues[i + 1] = this.callArguments[i].executeGeneric(frame);
+                argumentValues[i + infoVal] = this.callArguments[i].executeGeneric(frame);
 
             argumentValues = extendedArguments(argumentValues, functionObject);
-
 
             return this.dispatchNode.executeDispatch(function, argumentValues);
         }
@@ -65,7 +65,7 @@ public class FunctionCallExprNode extends EasyScriptExprNode {
         for (; i < arguments.length; i++)
             ret[i] = arguments[i];
         for (; i < function.argumentCount; i++)
-            ret[i] = Undefined.INSTANCE;
+            ret[i] = Undefined.instance;
 
         return ret;
     }

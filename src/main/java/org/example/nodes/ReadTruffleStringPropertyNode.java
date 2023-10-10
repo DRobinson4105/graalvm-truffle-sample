@@ -5,9 +5,9 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.ImportStatic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptTruffleStrings;
 import org.example.runtime.FunctionObject;
-import org.example.runtime.Undefined;
 
 @ImportStatic(EasyScriptTruffleStrings.class)
 public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
@@ -22,7 +22,7 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
             @Cached TruffleString.CodePointLengthNode lengthNode,
             @Cached TruffleString.SubstringNode substringNode) {
         return index < 0 || index >= EasyScriptTruffleStrings.length(truffleString, lengthNode)
-                ? Undefined.INSTANCE
+                ? Undefined.instance
                 : EasyScriptTruffleStrings.substring(truffleString, index, 1, substringNode);
     }
 
@@ -55,10 +55,10 @@ public abstract class ReadTruffleStringPropertyNode extends EasyScriptNode {
     }
 
     @Fallback
-    protected Undefined readUnknownProperty(
+    protected Object readUnknownProperty(
             @SuppressWarnings("unused") TruffleString truffleString,
             @SuppressWarnings("unused") Object property
     ) {
-        return Undefined.INSTANCE;
+        return Undefined.instance;
     }
 }

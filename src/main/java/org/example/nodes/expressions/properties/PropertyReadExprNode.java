@@ -6,10 +6,10 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.strings.TruffleString;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.nodes.ReadTruffleStringPropertyNode;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.runtime.Undefined;
 
 @NodeChild("target")
 @NodeField(name = "propertyName", type = String.class)
@@ -26,7 +26,7 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
         } catch (UnsupportedMessageException e) {
             throw new EasyScriptException(this, e.getMessage());
         } catch (UnknownIdentifierException e) {
-            return Undefined.INSTANCE;
+            return Undefined.instance;
         }
     }
 
@@ -46,6 +46,6 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
 
     @Fallback
     protected Object readUndefinedProperty(Object target) {
-        return Undefined.INSTANCE;
+        return Undefined.instance;
     }
 }

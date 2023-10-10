@@ -2,8 +2,8 @@ package org.example.nodes.statements.blocks;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.statements.EasyScriptStmtNode;
-import org.example.runtime.Undefined;
 
 import java.util.List;
 
@@ -18,13 +18,9 @@ public final class BlockStmtNode extends EasyScriptStmtNode {
     @Override
     @ExplodeLoop
     public Object executeStatement(VirtualFrame frame) {
-        if (this.stmts.length == 0)
-            return Undefined.INSTANCE;
+        for (EasyScriptStmtNode stmt : this.stmts)
+            stmt.executeStatement(frame);
 
-        int lastStatementIndex = this.stmts.length - 1;
-        for (int i = 0; i < lastStatementIndex; i++)
-            stmts[i].executeStatement(frame);
-
-        return stmts[lastStatementIndex].executeStatement(frame);
+        return Undefined.instance;
     }
 }

@@ -10,6 +10,10 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
+import com.oracle.truffle.js.runtime.objects.Undefined;
+import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.Proxy;
+import org.graalvm.polyglot.proxy.ProxyArray;
 
 @ExportLibrary(InteropLibrary.class)
 public class ArrayObject extends DynamicObject {
@@ -51,7 +55,7 @@ public class ArrayObject extends DynamicObject {
     Object readArrayElement(long index) {
         return isArrayElementReadable(index)
                 ? this.arrayElements[(int) index]
-                : Undefined.INSTANCE;
+                : Undefined.instance;
     }
 
     @ExportMessage
@@ -64,7 +68,7 @@ public class ArrayObject extends DynamicObject {
             for (int i = 0; i < index; i++) {
                 newArrayElements[i] = i < this.arrayElements.length
                         ? this.arrayElements[i]
-                        : Undefined.INSTANCE;
+                        : Undefined.instance;
             }
             newArrayElements[(int) index] = value;
             this.setArrayElements(newArrayElements, objectLibrary);

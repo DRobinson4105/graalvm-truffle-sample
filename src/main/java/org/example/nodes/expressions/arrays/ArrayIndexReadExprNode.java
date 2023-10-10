@@ -7,9 +7,9 @@ import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.InvalidArrayIndexException;
 import com.oracle.truffle.api.interop.UnsupportedMessageException;
 import com.oracle.truffle.api.library.CachedLibrary;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.runtime.Undefined;
 
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
@@ -36,6 +36,6 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
 
     @Fallback
     protected Object invalidArrayOrIndex(Object array, Object index) {
-        return Undefined.INSTANCE;
+        return Undefined.instance;
     }
 }

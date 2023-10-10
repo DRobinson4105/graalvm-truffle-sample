@@ -8,6 +8,7 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 import com.oracle.truffle.api.utilities.CyclicAssumption;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.EasyScriptTypeSystemGen;
 import org.example.nodes.FunctionDispatchNode;
@@ -35,6 +36,10 @@ public final class FunctionObject implements TruffleObject {
         this.isClosure = true;
     }
 
+    public FunctionObject(CallTarget callTarget, int argumentCount) {
+        this(callTarget, argumentCount, null);
+    }
+
     @ExportMessage
     boolean isExecutable() {
         return true;
@@ -53,7 +58,7 @@ public final class FunctionObject implements TruffleObject {
     private boolean isEasyScriptValue(Object value) {
         return EasyScriptTypeSystemGen.isImplicitDouble(value) ||
                 EasyScriptTypeSystemGen.isBoolean(value) ||
-                value == Undefined.INSTANCE ||
+                value == Undefined.instance ||
                 value instanceof ArrayObject ||
                 value instanceof FunctionObject;
     }

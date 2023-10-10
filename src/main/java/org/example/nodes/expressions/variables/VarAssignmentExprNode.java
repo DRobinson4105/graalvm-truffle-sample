@@ -6,6 +6,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import org.example.nodes.expressions.EasyScriptExprNode;
 
+import java.util.function.Consumer;
+
 @NodeChild("initializerExpr")
 @NodeField(name = "frameSlot", type = int.class)
 @NodeField(name = "depth", type = int.class)
@@ -13,6 +15,12 @@ import org.example.nodes.expressions.EasyScriptExprNode;
 public abstract class VarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract int getFrameSlot();
     protected abstract int getDepth();
+
+    protected final void assign(VirtualFrame frame, Consumer<VirtualFrame> valueSetter, FrameSlotKind frameSlotKind) {
+        frame = getFrame(frame);
+        frame.getFrameDescriptor().setSlotKind(this.getFrameSlot(), frameSlotKind);
+        valueSetter.accept(frame);
+    }
 
     @ExplodeLoop
     protected final VirtualFrame getFrame(VirtualFrame frame) {
@@ -25,10 +33,7 @@ public abstract class VarAssignmentExprNode extends EasyScriptExprNode {
     @Specialization(guards = "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
             "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Int")
     protected int intAssignment(VirtualFrame frame, int value) {
-        int frameSlot = this.getFrameSlot();
-        frame = getFrame(frame);
-        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Int);
-        frame.setInt(frameSlot, value);
+        assign(frame, curFrame -> curFrame.setInt(this.getFrameSlot(), value), FrameSlotKind.Int);
         return value;
     }
 
@@ -36,10 +41,7 @@ public abstract class VarAssignmentExprNode extends EasyScriptExprNode {
             guards = "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
             "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Double")
     protected double doubleAssignment(VirtualFrame frame, double value) {
-        var frameSlot = this.getFrameSlot();
-        frame = getFrame(frame);
-        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Double);
-        frame.setDouble(frameSlot, value);
+        assign(frame, curFrame -> curFrame.setDouble(this.getFrameSlot(), value), FrameSlotKind.Double);
         return value;
     }
 
@@ -47,19 +49,13 @@ public abstract class VarAssignmentExprNode extends EasyScriptExprNode {
             guards = "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Illegal || " +
             "getFrame(frame).getFrameDescriptor().getSlotKind(getFrameSlot()) == Boolean")
     protected boolean boolAssignment(VirtualFrame frame, boolean value) {
-        var frameSlot = this.getFrameSlot();
-        frame = getFrame(frame);
-        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Boolean);
-        frame.setBoolean(frameSlot, value);
+        assign(frame, curFrame -> curFrame.setBoolean(this.getFrameSlot(), value), FrameSlotKind.Boolean);
         return value;
     }
 
     @Specialization(replaces = {"intAssignment", "doubleAssignment", "boolAssignment"})
     protected Object objectAssignment(VirtualFrame frame, Object value) {
-        var frameSlot = this.getFrameSlot();
-        frame = getFrame(frame);
-        frame.getFrameDescriptor().setSlotKind(frameSlot, FrameSlotKind.Object);
-        frame.setObject(frameSlot, value);
+        assign(frame, curFrame -> curFrame.setObject(this.getFrameSlot(), value), FrameSlotKind.Object);
         return value;
     }
 }

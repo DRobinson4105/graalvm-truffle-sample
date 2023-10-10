@@ -5,10 +5,10 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptTruffleStrings;
 import org.example.EasyScriptTypeSystemGen;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.runtime.Undefined;
 
 @NodeChild("leftNode")
 @NodeChild("rightNode")
@@ -44,6 +44,6 @@ public abstract class AdditionExprNode extends EasyScriptExprNode {
     protected static boolean isComplex(Object value) {
         return !(EasyScriptTypeSystemGen.isImplicitDouble(value) ||
                 EasyScriptTypeSystemGen.isBoolean(value) ||
-                value == Undefined.INSTANCE);
+                value == Undefined.instance);
     }
 }

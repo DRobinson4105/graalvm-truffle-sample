@@ -44,35 +44,7 @@ public final class EasyScriptTruffleLanguage extends
 
     @Override
     protected EasyScriptLanguageContext createContext(Env env) {
-        var context = new EasyScriptLanguageContext(this.createStringPrototype());
-
-        // built-in functions
-//        FunctionObject[] builtInFunctions = {
-//                this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
-//                this.defineBuiltInFunction(PowFunctionBodyExprNodeFactory.getInstance())
-//        };
-//        String[] names = {"abs", "pow"};
-//
-//        var objectLibrary = DynamicObjectLibrary.getUncached();
-//        objectLibrary.putConstant(context.globalScopeObject, "Math", MathObject.create(this, builtInFunctions, names), 1);
-
-        return context;
-    }
-
-    private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
-        var functionArguments = IntStream
-                .range(0, nodeFactory.getExecutionSignature().size())
-                .mapToObj(ReadFunctionArgExprNode::new)
-                .toArray(ReadFunctionArgExprNode[]::new);
-
-        var builtInFuncRootNode = new BuiltInFuncRootNode(this,
-                nodeFactory.createNode((Object) functionArguments));
-
-        return new FunctionObject(
-                builtInFuncRootNode.getCallTarget(),
-                functionArguments.length,
-                null
-        );
+        return new EasyScriptLanguageContext(this.createStringPrototype());
     }
 
     private StringPrototype createStringPrototype() {

@@ -1,9 +1,9 @@
 package org.example.nodes.statements.controlflow;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.nodes.statements.EasyScriptStmtNode;
-import org.example.runtime.Undefined;
 import com.oracle.truffle.api.profiles.ConditionProfile;
 
 public class IfStmtNode extends EasyScriptStmtNode {
@@ -28,6 +28,6 @@ public class IfStmtNode extends EasyScriptStmtNode {
         else if (this.elseStmt != null)
             return this.elseStmt.executeStatement(frame);
 
-        return Undefined.INSTANCE;
+        return Undefined.instance;
     }
 }

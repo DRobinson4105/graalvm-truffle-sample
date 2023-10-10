@@ -4,17 +4,17 @@ import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.strings.TruffleString;
+import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptTypeSystemGen;
 import org.example.nodes.EasyScriptNode;
 import org.example.EasyScriptTypeSystem;
-import org.example.runtime.Undefined;
 
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
     public boolean executeBool(VirtualFrame frame) {
         Object value = this.executeGeneric(frame);
 
-        if (value == Undefined.INSTANCE)
+        if (value == Undefined.instance)
             return false;
         if (value instanceof Boolean boolValue)
             return boolValue;

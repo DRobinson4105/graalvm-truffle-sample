@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import org.example.nodes.expressions.RequireExprNode;
 import org.example.nodes.expressions.variables.*;
 import org.example.nodes.expressions.arithmetic.*;
 import org.example.nodes.expressions.arrays.*;
@@ -18,6 +19,7 @@ import org.example.nodes.expressions.properties.*;
 import org.example.nodes.expressions.comparisons.*;
 import org.example.nodes.statements.EasyScriptStmtNode;
 import org.example.nodes.statements.ExprStmtNode;
+import org.example.nodes.statements.PrintStmtNode;
 import org.example.nodes.statements.blocks.*;
 import org.example.nodes.statements.controlflow.*;
 import org.example.nodes.statements.loops.*;
@@ -41,7 +43,7 @@ public final class EasyScriptTruffleParser {
         var easyScriptTruffleParser = new EasyScriptTruffleParser(arrayShape);
         List<EasyScriptStmtNode> stmts = easyScriptTruffleParser.parseStmtsList(parser.start().stmt());
         return new ParsingResult(
-                new UserFuncBodyStmtNode(stmts),
+                new FuncBodyStmtNode(stmts),
                 easyScriptTruffleParser.frameDescriptorBuilder.build()
         );
     }
@@ -105,14 +107,7 @@ public final class EasyScriptTruffleParser {
 
         for (StmtContext stmt : stmts) {
             if (stmt instanceof VarDeclStmtContext varDeclStmt) {
-                for (BindingContext binding : varDeclStmt.binding()) {
-                    DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
-                    String variableId = binding.ID().getText();
-                    int frameSlot = this.frameDescriptorBuilder.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
-                    if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind, currentDepth)) != null) {
-                        throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
-                    }
-                }
+                addVarToFrame(varDeclStmt);
             }
         }
 
@@ -144,6 +139,8 @@ public final class EasyScriptTruffleParser {
             return parseBreakStmt();
         } else if (stmt instanceof ContinueStmtContext) {
             return parseContinueStmt();
+        } else if (stmt instanceof PrintStmtContext printStmt) {
+            return parsePrintStmt(printStmt);
         } else {
             throw new EasyScriptException("Statement does not exist");
         }
@@ -153,7 +150,7 @@ public final class EasyScriptTruffleParser {
         DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
         for (BindingContext varBinding : varDeclStmt.binding()) {
             String variableId = varBinding.ID().getText();
-            FrameMember frameMember = this.localScopes.peek().get(variableId);
+            FrameMember frameMember = findFrameMember(variableId);
             var bindingExpr = varBinding.expr1();
             EasyScriptExprNode initializerExpr;
             if (bindingExpr == null) {
@@ -223,15 +220,29 @@ public final class EasyScriptTruffleParser {
     }
 
     private ForStmtNode parseForStmt(ForStmtContext forStmt) {
-        var init = parseStmt(forStmt.init);
-        var condition = parseExpr1(forStmt.cond);
-        var update = parseExpr1(forStmt.updt);
-
         this.localScopes.push(new HashMap<>());
+        if (forStmt.init instanceof VarDeclStmtContext varDeclStmt) {
+            addVarToFrame(varDeclStmt);
+        }
+        var init = (forStmt.init != null) ? parseStmt(forStmt.init) : null;
+        var condition = (forStmt.cond != null) ? parseExpr1(forStmt.cond) : null;
+        var update = (forStmt.updt != null) ? parseExpr1(forStmt.updt) : null;
+
         var body = parseStmt(forStmt.body);
         this.localScopes.pop();
 
         return new ForStmtNode(init, condition, update, body);
+    }
+
+    private void addVarToFrame(VarDeclStmtContext varDeclStmt) {
+        for (BindingContext binding : varDeclStmt.binding()) {
+            DeclarationKind declarationKind = DeclarationKind.fromToken(varDeclStmt.kind.getText());
+            String variableId = binding.ID().getText();
+            int frameSlot = this.frameDescriptorBuilder.addSlot(FrameSlotKind.Illegal, variableId, declarationKind);
+            if (this.localScopes.peek().putIfAbsent(variableId, new LocalVariable(frameSlot, declarationKind, currentDepth)) != null) {
+                throw new EasyScriptException("Identifier '" + variableId + "' has already been declared");
+            }
+        }
     }
 
     private BreakStmtNode parseBreakStmt() {
@@ -240,6 +251,10 @@ public final class EasyScriptTruffleParser {
 
     private ContinueStmtNode parseContinueStmt() {
         return new ContinueStmtNode();
+    }
+
+    private PrintStmtNode parsePrintStmt(PrintStmtContext printStmt) {
+        return new PrintStmtNode(parseExpr1(printStmt.expr1()));
     }
 
     private EasyScriptExprNode parseExpr1(Expr1Context expr1) {
@@ -288,7 +303,7 @@ public final class EasyScriptTruffleParser {
     private EasyScriptExprNode parseEqNotEqExpr(EqNotEqExpr2Context eqNotEqExpr) {
         EasyScriptExprNode left = parseExpr2(eqNotEqExpr.left);
         EasyScriptExprNode right = parseExpr3(eqNotEqExpr.right);
-        if (eqNotEqExpr.c.getText().equals("==="))
+        if (eqNotEqExpr.c.getText().equals("=="))
             return EqualityExprNodeGen.create(left, right);
         else
             return InequalityExprNodeGen.create(left, right);
@@ -338,7 +353,7 @@ public final class EasyScriptTruffleParser {
     }
 
     private NegationExprNode parseUnaryMinusExpr(NegationExpr4Context negExpr) {
-        return NegationExprNodeGen.create(parseExpr5(negExpr.expr5()));
+        return NegationExprNodeGen.create(parseExpr4(negExpr.expr4()));
     }
 
     private EasyScriptExprNode parseExpr5(Expr5Context expr5) {
@@ -352,6 +367,8 @@ public final class EasyScriptTruffleParser {
             return parseLiteralExpr(literalExpr);
         } else if (expr5 instanceof ClosureLiteralExpr5Context closureLiteralExpr) {
             return parseClosureLiteralExpr(closureLiteralExpr);
+        } else if (expr5 instanceof RequireExpr5Context requireExpr) {
+            return parseRequire(requireExpr);
         } else if (expr5 instanceof ReferenceExpr5Context referenceExpr) {
             return parseReference(referenceExpr.ID().getText());
         } else if (expr5 instanceof CallExpr5Context callExpr) {
@@ -418,9 +435,13 @@ public final class EasyScriptTruffleParser {
 
         return new ClosureLiteralExprNode(
                 frameDescriptor,
-                new UserFuncBodyStmtNode(funcStmts),
+                new FuncBodyStmtNode(funcStmts),
                 funcArgs.size()
         );
+    }
+
+    private EasyScriptExprNode parseRequire(RequireExpr5Context requireExpr) {
+        return new RequireExprNode(parseExpr1(requireExpr.expr1()));
     }
 
     private EasyScriptExprNode parseReference(String variableId) {
