@@ -31,7 +31,7 @@ dependencies {
     jmh("org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}")
     jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}")
 
-    var apacheVersion = "1.10.0"
+    val apacheVersion = "1.10.0"
     implementation("org.apache.commons:commons-text:${apacheVersion}")
 }
 

@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class TestRunner {
     public static Value runString(String code){
         Context context = Context.create();
@@ -20,6 +17,7 @@ public class TestRunner {
         return runString(code.stripIndent());
     }
 
+    @SuppressWarnings("unused")
     public static Value runTestFile(String name){
         String fileName = "/Users/drobinson/IdeaProjects/GraalVMLearning/src/test/java/org/example/" + name;
         String content;

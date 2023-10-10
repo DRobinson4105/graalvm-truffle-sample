@@ -37,7 +37,7 @@ public abstract class AdditionExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected double undefinedAddition(Object leftValue, Object rightValue) {
+    protected double undefinedAddition(@SuppressWarnings("unused") Object leftValue, @SuppressWarnings("unused") Object rightValue) {
         return Double.NaN;
     }
 

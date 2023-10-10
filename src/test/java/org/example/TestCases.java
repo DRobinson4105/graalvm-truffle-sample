@@ -4,14 +4,11 @@ import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-
 import static org.example.Main.exportAndOpenAllPackagesToUnnamed;
 import static org.example.TestRunner.runInline;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Tests {
-
+public class TestCases {
     @BeforeAll
     public static void setup(){
         exportAndOpenAllPackagesToUnnamed("org.graalvm.truffle");

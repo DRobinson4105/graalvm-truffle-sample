@@ -3,16 +3,14 @@ package org.example;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.Shape;
+import com.oracle.truffle.api.CallTarget;
+import com.oracle.truffle.api.TruffleLanguage;
 import org.example.nodes.expressions.functions.builtin.BuiltInFunctionBodyExprNode;
 import org.example.nodes.expressions.functions.builtin.CharAtMethodBodyExprNodeFactory;
 import org.example.nodes.expressions.functions.ReadFunctionArgExprNode;
 import org.example.nodes.roots.BuiltInFuncRootNode;
 import org.example.nodes.roots.StmtBlockRootNode;
-
-import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.TruffleLanguage;
 import org.example.runtime.ArrayObject;
-import org.example.runtime.FunctionObject;
 
 import java.util.stream.IntStream;
 

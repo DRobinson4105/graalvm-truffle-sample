@@ -1,13 +1,11 @@
 package org.example.runtime;
 
-import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
-import com.oracle.truffle.api.utilities.CyclicAssumption;
 import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.EasyScriptTypeSystemGen;

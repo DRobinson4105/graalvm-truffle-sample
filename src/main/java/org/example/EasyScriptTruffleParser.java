@@ -162,6 +162,7 @@ public final class EasyScriptTruffleParser {
                 initializerExpr = this.parseExpr1(bindingExpr);
             }
 
+            assert frameMember != null;
             VarAssignmentExprNode assignmentExpr = VarAssignmentExprNodeGen.create(initializerExpr, frameMember.index, this.currentDepth - frameMember.depth);
             return new ExprStmtNode(assignmentExpr, true);
         }

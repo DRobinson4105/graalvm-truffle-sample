@@ -5,20 +5,15 @@ import com.oracle.truffle.api.interop.UnknownIdentifierException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
-import com.oracle.truffle.api.nodes.EncapsulatingNodeReference;
-import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.object.DynamicObject;
 import com.oracle.truffle.api.object.DynamicObjectLibrary;
 import com.oracle.truffle.api.object.Shape;
 import com.oracle.truffle.js.runtime.objects.Undefined;
-import org.graalvm.polyglot.Value;
-import org.graalvm.polyglot.proxy.Proxy;
-import org.graalvm.polyglot.proxy.ProxyArray;
 
 @ExportLibrary(InteropLibrary.class)
 public class ArrayObject extends DynamicObject {
-    @DynamicField
-    private long length;
+    @SuppressWarnings("unused")
+    @DynamicField private long length;
     private Object[] arrayElements;
 
     public ArrayObject(Shape arrayShape, Object[] arrayElements) {
@@ -90,14 +85,14 @@ public class ArrayObject extends DynamicObject {
             String member,
             @CachedLibrary("this") DynamicObjectLibrary objectLibrary
     ) throws UnknownIdentifierException {
-            return switch (member) {
-                case "length" -> objectLibrary.getOrDefault(this, "length", 0);
-                default -> throw UnknownIdentifierException.create(member);
-            };
+            if (member.equals("length"))
+                return objectLibrary.getOrDefault(this, "length", 0);
+
+            throw UnknownIdentifierException.create(member);
     }
 
     @ExportMessage
-    Object getMembers(boolean includeInternal) {
+    Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
         return new MemberNamesObject(new String[]{"length"});
     }
 
