@@ -17,7 +17,7 @@ import org.example.nodes.expressions.functions.FunctionCallExprNode;
 public abstract class FunctionDispatchNode extends Node {
     public abstract Object executeDispatch(Object function, Object[] arguments);
 
-    @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()", limit = "2")
+    @Specialization(guards = "function.callTarget == directCallNode.getCallTarget()")
     protected static Object dispatchDirectly(
             FunctionObject function, Object[] arguments,
             @Cached("create(function.callTarget)") DirectCallNode directCallNode

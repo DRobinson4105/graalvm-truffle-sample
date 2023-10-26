@@ -35,7 +35,7 @@ public final class EasyScriptTruffleStrings {
     }
 
     @CompilerDirectives.TruffleBoundary
-    public static String concatTwoStrings(Object object1, Object object2) {
+    public static String concatTwoObjects(Object object1, Object object2) {
         return object1.toString() + object2.toString();
     }
 }

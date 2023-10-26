@@ -9,7 +9,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.example.nodes.expressions.EasyScriptExprNode;
-import org.example.nodes.expressions.RequireExprNode;
+import org.example.nodes.expressions.functions.builtin.RequireExprNode;
 import org.example.nodes.expressions.variables.*;
 import org.example.nodes.expressions.arithmetic.*;
 import org.example.nodes.expressions.arrays.*;

@@ -1,8 +1,9 @@
-package org.example.nodes.expressions;
+package org.example.nodes.expressions.functions.builtin;
 
 import com.oracle.truffle.api.dsl.*;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import org.example.EasyScriptException;
+import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.nodes.expressions.functions.ReadFunctionArgExprNode;
 import org.example.nodes.expressions.functions.builtin.AbsFunctionBodyExprNodeFactory;
 import org.example.nodes.expressions.functions.builtin.BuiltInFunctionBodyExprNode;
@@ -13,6 +14,9 @@ import org.example.runtime.MathObject;
 import java.util.stream.IntStream;
 
 public final class RequireExprNode extends EasyScriptExprNode {
+    /**
+     * The name of the requested library
+     */
     @SuppressWarnings("FieldMayBeFinal")
     @Child private EasyScriptExprNode textExpr;
     public RequireExprNode(EasyScriptExprNode textExpr) {
@@ -29,6 +33,10 @@ public final class RequireExprNode extends EasyScriptExprNode {
             throw new EasyScriptException(this, "Library does not exist");
     }
 
+    /**
+     * Creates a truffle object with all the built-in math functions
+     * @return the math object
+     */
     private Object getMathObject() {
         FunctionObject[] builtInFunctions = {
                 this.defineBuiltInFunction(AbsFunctionBodyExprNodeFactory.getInstance()),
@@ -39,6 +47,9 @@ public final class RequireExprNode extends EasyScriptExprNode {
         return MathObject.create(this.currentTruffleLanguage(), builtInFunctions, names);
     }
 
+    /**
+     * Uses the node factory to create a function object
+     */
     private FunctionObject defineBuiltInFunction(NodeFactory<? extends BuiltInFunctionBodyExprNode> nodeFactory) {
         var functionArguments = IntStream
                 .range(0, nodeFactory.getExecutionSignature().size())

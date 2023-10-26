@@ -14,7 +14,6 @@ import com.oracle.truffle.api.staticobject.StaticShape;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-
 @ExportLibrary(InteropLibrary.class)
 public class MathObject implements TruffleObject {
     public static MathObject create(

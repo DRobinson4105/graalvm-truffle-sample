@@ -1,10 +1,13 @@
 package org.example.nodes.expressions.variables;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.*;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import com.oracle.truffle.api.dsl.OnBefore;
 
 import java.util.function.Consumer;
 
@@ -15,6 +18,8 @@ import java.util.function.Consumer;
 public abstract class VarAssignmentExprNode extends EasyScriptExprNode {
     protected abstract int getFrameSlot();
     protected abstract int getDepth();
+    @CompilerDirectives.CompilationFinal
+    private MaterializedFrame frame = null;
 
     protected final void assign(VirtualFrame frame, Consumer<VirtualFrame> valueSetter, FrameSlotKind frameSlotKind) {
         frame = getFrame(frame);

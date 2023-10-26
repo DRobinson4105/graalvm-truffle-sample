@@ -27,6 +27,10 @@ public class TestCases {
                 return 1;
                 """).asInt()
         );
+        assertEquals(1, runInline("""
+                return --1;
+                """).asInt()
+        );
         assertEquals(-1, runInline("""
                 return -1;
                 """).asInt()

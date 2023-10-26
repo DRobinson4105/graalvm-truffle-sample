@@ -15,6 +15,7 @@ public class ArrayObject extends DynamicObject {
     @SuppressWarnings("unused")
     @DynamicField private long length;
     private Object[] arrayElements;
+    private final String[] methodNames = new String[]{"length"};
 
     public ArrayObject(Shape arrayShape, Object[] arrayElements) {
         super(arrayShape);
@@ -85,19 +86,23 @@ public class ArrayObject extends DynamicObject {
             String member,
             @CachedLibrary("this") DynamicObjectLibrary objectLibrary
     ) throws UnknownIdentifierException {
-            if (member.equals("length"))
+        for (String method : this.methodNames){
+            if (member.equals(method))
                 return objectLibrary.getOrDefault(this, "length", 0);
+        }
 
-            throw UnknownIdentifierException.create(member);
+        throw UnknownIdentifierException.create(member);
     }
 
     @ExportMessage
     Object getMembers(@SuppressWarnings("unused") boolean includeInternal) {
-        return new MemberNamesObject(new String[]{"length"});
+        return new MemberNamesObject(methodNames);
     }
 
     private void setArrayElements(Object[] arrayElements, DynamicObjectLibrary objectLibrary) {
         this.arrayElements = arrayElements;
-        objectLibrary.put(this, "length", arrayElements.length);
+        for (String method : this.methodNames) {
+            objectLibrary.put(this, method, arrayElements.length);
+        }
     }
 }

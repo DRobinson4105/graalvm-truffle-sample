@@ -26,7 +26,7 @@ public abstract class AdditionExprNode extends EasyScriptExprNode {
     @Specialization(guards = "isComplex(left) || isComplex(right)")
     protected TruffleString objectAsStringConcatenation(Object left, Object right, @Cached TruffleString.FromJavaStringNode fromJavaStringNode) {
         return EasyScriptTruffleStrings.fromJavaString(
-                EasyScriptTruffleStrings.concatTwoStrings(left, right),
+                EasyScriptTruffleStrings.concatTwoObjects(left, right),
                 fromJavaStringNode
         );
     }
