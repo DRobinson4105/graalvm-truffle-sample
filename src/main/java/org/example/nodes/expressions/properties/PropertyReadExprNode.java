@@ -31,8 +31,10 @@ public abstract class PropertyReadExprNode extends EasyScriptExprNode {
     }
 
     @Specialization
-    protected Object readPropertyOfString(TruffleString target,
-                                          @Cached ReadTruffleStringPropertyNode readTruffleStringPropertyNode) {
+    protected Object readPropertyOfString(
+            TruffleString target,
+            @Cached ReadTruffleStringPropertyNode readTruffleStringPropertyNode
+    ) {
         return readTruffleStringPropertyNode.executeReadTruffleStringProperty(target, this.getPropertyName());
     }
 

@@ -8,17 +8,17 @@ import org.example.nodes.expressions.EasyScriptExprNode;
 @NodeChild("node")
 public abstract class NegationExprNode extends EasyScriptExprNode {
     @Specialization(rewriteOn = ArithmeticException.class)
-    protected int negateInt(int value) {
+    protected int intNegation(int value) {
         return Math.negateExact(value);
     }
 
-    @Specialization(replaces = "negateInt")
-    protected double negateDouble(double value) {
+    @Specialization(replaces = "intNegation")
+    protected double doubleNegation(double value) {
         return -value;
     }
 
     @Fallback
-    protected double negateUndefined(Object value) {
+    protected double undefinedNegation(@SuppressWarnings("unused") Object value) {
         return Double.NaN;
     }
 }

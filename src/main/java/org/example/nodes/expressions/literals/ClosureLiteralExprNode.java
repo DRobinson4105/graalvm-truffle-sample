@@ -7,7 +7,7 @@ import org.example.nodes.roots.StmtBlockRootNode;
 import org.example.nodes.statements.blocks.FuncBodyStmtNode;
 import org.example.runtime.FunctionObject;
 
-public class ClosureLiteralExprNode extends EasyScriptExprNode {
+public final class ClosureLiteralExprNode extends EasyScriptExprNode {
     private final FrameDescriptor frameDescriptor;
     private final FuncBodyStmtNode funcBody;
     private final int argumentCount;

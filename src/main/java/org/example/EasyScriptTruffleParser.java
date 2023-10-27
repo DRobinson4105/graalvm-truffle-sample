@@ -163,7 +163,7 @@ public final class EasyScriptTruffleParser {
             }
 
             assert frameMember != null;
-            VarAssignmentExprNode assignmentExpr = VarAssignmentExprNodeGen.create(initializerExpr, frameMember.index, this.currentDepth - frameMember.depth);
+            VarAssignmentExprNode assignmentExpr = VarAssignmentExprNodeGen.create(initializerExpr, this.currentDepth - frameMember.depth, frameMember.index);
             return new ExprStmtNode(assignmentExpr, true);
         }
 
@@ -284,7 +284,7 @@ public final class EasyScriptTruffleParser {
         if (localVariable.declarationKind == DeclarationKind.CONST)
             throw new EasyScriptException("Assignment to constant variable '" + variableId + "'");
 
-        return VarAssignmentExprNodeGen.create(initializerExpr, localVariable.index, this.currentDepth - frameMember.depth);
+        return VarAssignmentExprNodeGen.create(initializerExpr, this.currentDepth - frameMember.depth, localVariable.index);
     }
 
     private ArrayIndexWriteExprNode parseArrayIndexWriteExpr(ArrayIndexWriteExpr1Context arrayIndexWriteExpr) {

@@ -16,6 +16,13 @@ import java.util.stream.Collectors;
 
 @ExportLibrary(InteropLibrary.class)
 public class MathObject implements TruffleObject {
+    /**
+     * Build {@link StaticShape} for math object with all build-in functions
+     * @param language language that the math object is in
+     * @param functions built-in functions
+     * @param names names for the built-in functions
+     * @return math object
+     */
     public static MathObject create(
             EasyScriptTruffleLanguage language,
             FunctionObject[] functions,

@@ -4,29 +4,35 @@ import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.strings.TruffleString;
 import org.example.nodes.expressions.EasyScriptExprNode;
 
 @NodeChild("leftNode")
 @NodeChild("rightNode")
 public abstract class LessThanEqualToExprNode extends EasyScriptExprNode {
-    @Specialization(rewriteOn = ArithmeticException.class)
+    @Specialization
     protected boolean lessThanEqualToInt(int left, int right) {
         return left <= right;
     }
 
-    @Specialization(replaces = "lessThanEqualToInt")
+    @Specialization
     protected boolean lessThanEqualToDouble(double left, double right) {
         return left <= right;
     }
 
     @Specialization
-    public boolean lessThanEqualToString(TruffleString left, TruffleString right, @Cached TruffleString.CompareCharsUTF16Node compareNode) {
+    public boolean lessThanEqualToString(
+            TruffleString left, TruffleString right,
+            @Cached TruffleString.CompareCharsUTF16Node compareNode
+    ) {
         return compareNode.execute(left, right) <= 0;
     }
 
     @Fallback
-    protected boolean lessThanEqualToUndefined(Object left, Object right) {
+    protected boolean lessThanEqualToUndefined(
+            @SuppressWarnings("unused") Object left, @SuppressWarnings("unused") Object right
+    ) {
         return false;
     }
 }

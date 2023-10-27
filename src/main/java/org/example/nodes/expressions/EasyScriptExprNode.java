@@ -12,7 +12,8 @@ import org.example.EasyScriptTypeSystem;
 @TypeSystemReference(EasyScriptTypeSystem.class)
 public abstract class EasyScriptExprNode extends EasyScriptNode {
     /**
-     * Converts the result of {@link #executeGeneric(VirtualFrame)} to a boolean as a truthy value. A node can override this method if it has a better way to producing a value of type bool.
+     * Converts the result of {@link #executeGeneric(VirtualFrame)} to a boolean as a truthy value.
+     * A node can override this method if it has a better way to producing a value of type bool.
      *
      * @param frame the enclosing frame of the current node
      * @return the value of the execution as a boolean
@@ -35,7 +36,8 @@ public abstract class EasyScriptExprNode extends EasyScriptNode {
     }
 
     /**
-     * Attempts to convert the result of {@link #executeGeneric(VirtualFrame)} A node can override this method if it has a better way to producing a value of type int.
+     * Attempts to convert the result of {@link #executeGeneric(VirtualFrame)} A node can override
+     * this method if it has a better way to producing a value of type int.
      *
      * @param frame the enclosing frame of the current node
      * @return the value of the execution as an int

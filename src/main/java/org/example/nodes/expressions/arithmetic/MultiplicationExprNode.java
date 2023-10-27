@@ -19,7 +19,10 @@ public abstract class MultiplicationExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected double undefinedMultiplication(Object leftValue, Object rightValue) {
+    protected double undefinedMultiplication(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue
+    ) {
         return Double.NaN;
     }
 }

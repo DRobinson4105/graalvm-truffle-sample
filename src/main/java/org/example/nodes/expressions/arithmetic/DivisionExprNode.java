@@ -19,7 +19,10 @@ public abstract class DivisionExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected double undefinedDivision(Object leftValue, Object rightValue) {
+    protected double undefinedDivision(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue
+    ) {
         return Double.NaN;
     }
 }

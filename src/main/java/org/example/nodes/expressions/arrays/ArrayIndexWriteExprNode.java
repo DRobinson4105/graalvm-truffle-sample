@@ -10,6 +10,7 @@ import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.library.CachedLibrary;
 import org.example.EasyScriptException;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import org.example.runtime.ArrayObject;
 
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
@@ -31,14 +32,18 @@ public abstract class ArrayIndexWriteExprNode extends EasyScriptExprNode {
 
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
     protected Object indexUndefined(
-            Object target, Object index, Object rValue,
-            @CachedLibrary("target") InteropLibrary interopLibrary
+            @SuppressWarnings("unused") Object target, Object index,
+            @SuppressWarnings("unused") Object rValue,
+            @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary
     ) {
         throw new EasyScriptException("Cannot read properties of undefined (setting '" + index + "')");
     }
 
     @Fallback
-    protected Object invalidArrayOrIndex(Object array, Object index, Object rValue) {
+    protected Object invalidArrayOrIndex(
+            @SuppressWarnings("unused") Object array,
+            @SuppressWarnings("unused") Object index, Object rValue
+    ) {
         return rValue;
     }
 }

@@ -1,8 +1,7 @@
 package org.example.nodes.expressions.variables;
 
-import com.oracle.truffle.api.dsl.ImportStatic;
-import com.oracle.truffle.api.dsl.NodeField;
-import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.dsl.*;
+import com.oracle.truffle.api.dsl.Cached.Shared;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
@@ -23,23 +22,35 @@ public abstract class VarReferenceExprNode extends EasyScriptExprNode {
         return frame;
     }
 
-    @Specialization(guards = "getFrame(frame).isInt(getFrameSlot())")
-    protected int readInt(VirtualFrame frame) {
-        return this.getFrame(frame).getInt(this.getFrameSlot());
+    @Specialization(guards = "targetFrame.isInt(getFrameSlot())")
+    protected int readInt(
+            @SuppressWarnings("unused") VirtualFrame frame,
+            @Cached("getFrame(frame)") VirtualFrame targetFrame
+    ) {
+        return targetFrame.getInt(this.getFrameSlot());
     }
 
-    @Specialization(replaces = "readInt", guards = "getFrame(frame).isDouble(getFrameSlot())")
-    protected double readDouble(VirtualFrame frame) {
-        return this.getFrame(frame).getDouble(this.getFrameSlot());
+    @Specialization(replaces = "readInt", guards = "targetFrame.isDouble(getFrameSlot())")
+    protected double readDouble(
+            @SuppressWarnings("unused") VirtualFrame frame,
+            @Cached("getFrame(frame)") VirtualFrame targetFrame
+    ) {
+        return targetFrame.getDouble(this.getFrameSlot());
     }
 
-    @Specialization(guards = "getFrame(frame).isBoolean(getFrameSlot())")
-    protected boolean readBoolean(VirtualFrame frame) {
-        return this.getFrame(frame).getBoolean(this.getFrameSlot());
+    @Specialization(guards = "targetFrame.isBoolean(getFrameSlot())")
+    protected boolean readBoolean(
+            @SuppressWarnings("unused") VirtualFrame frame,
+            @Cached("getFrame(frame)") VirtualFrame targetFrame
+    ) {
+        return targetFrame.getBoolean(this.getFrameSlot());
     }
 
     @Specialization(replaces = {"readInt", "readDouble", "readBoolean"})
-    protected Object readObject(VirtualFrame frame) {
-        return this.getFrame(frame).getObject(this.getFrameSlot());
+    protected Object readObject(
+            @SuppressWarnings("unused") VirtualFrame frame,
+            @Cached("getFrame(frame)") VirtualFrame targetFrame
+    ) {
+        return targetFrame.getObject(this.getFrameSlot());
     }
 }

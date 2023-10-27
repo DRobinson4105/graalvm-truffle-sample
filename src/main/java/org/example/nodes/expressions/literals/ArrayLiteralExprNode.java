@@ -9,7 +9,7 @@ import org.example.runtime.ArrayObject;
 import java.util.Arrays;
 import java.util.List;
 
-public class ArrayLiteralExprNode extends EasyScriptExprNode {
+public final class ArrayLiteralExprNode extends EasyScriptExprNode {
     private final Shape arrayShape;
     @Children
     private final EasyScriptExprNode[] arrayElementExprs;

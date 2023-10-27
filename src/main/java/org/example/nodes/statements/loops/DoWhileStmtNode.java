@@ -11,7 +11,7 @@ import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.nodes.statements.EasyScriptStmtNode;
 
-public class DoWhileStmtNode extends EasyScriptStmtNode {
+public final class DoWhileStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child private LoopNode loopNode;
 

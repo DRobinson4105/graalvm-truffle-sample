@@ -10,8 +10,10 @@ public final class BuiltInFuncRootNode extends RootNode {
     @Child
     private BuiltInFunctionBodyExprNode functionBodyExpr;
 
-    public BuiltInFuncRootNode(EasyScriptTruffleLanguage truffleLanguage,
-                               BuiltInFunctionBodyExprNode functionBodyExpr) {
+    public BuiltInFuncRootNode(
+            EasyScriptTruffleLanguage truffleLanguage,
+            BuiltInFunctionBodyExprNode functionBodyExpr
+    ) {
         super(truffleLanguage);
 
         this.functionBodyExpr = functionBodyExpr;

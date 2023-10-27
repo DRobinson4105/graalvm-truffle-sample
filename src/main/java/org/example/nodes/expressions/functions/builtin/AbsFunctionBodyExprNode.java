@@ -15,7 +15,7 @@ public abstract class AbsFunctionBodyExprNode extends BuiltInFunctionBodyExprNod
     }
 
     @Fallback
-    protected double nonNumberAbs(Object argument) {
+    protected double nonNumberAbs(@SuppressWarnings("unused") Object argument) {
         return Double.NaN;
     }
 }

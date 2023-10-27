@@ -5,7 +5,7 @@ import com.oracle.truffle.js.nodes.control.ReturnException;
 import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.nodes.statements.EasyScriptStmtNode;
 
-public class ReturnStmtNode extends EasyScriptStmtNode {
+public final class ReturnStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child private EasyScriptExprNode expr;
 

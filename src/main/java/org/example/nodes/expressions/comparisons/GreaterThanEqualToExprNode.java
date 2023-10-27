@@ -6,27 +6,33 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.strings.TruffleString;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import com.oracle.truffle.api.nodes.Node;
 
 @NodeChild("leftNode")
 @NodeChild("rightNode")
 public abstract class GreaterThanEqualToExprNode extends EasyScriptExprNode {
-    @Specialization(rewriteOn = ArithmeticException.class)
+    @Specialization
     protected boolean greaterThanEqualToInt(int left, int right) {
         return left >= right;
     }
 
-    @Specialization(replaces = "greaterThanEqualToInt")
+    @Specialization
     protected boolean greaterThanEqualToDouble(double left, double right) {
         return left >= right;
     }
 
     @Specialization
-    protected boolean greaterThanEqualToString(TruffleString left, TruffleString right, @Cached TruffleString.CompareCharsUTF16Node compareNode) {
+    protected boolean greaterThanEqualToString(
+            TruffleString left, TruffleString right,
+            @Cached TruffleString.CompareCharsUTF16Node compareNode
+    ) {
         return compareNode.execute(left, right) >= 0;
     }
 
     @Fallback
-    protected boolean greaterThanEqualToUndefined(Object left, Object right) {
+    protected boolean greaterThanEqualToUndefined(
+            @SuppressWarnings("unused") Object left, @SuppressWarnings("unused") Object right
+    ) {
         return false;
     }
 }

@@ -19,7 +19,10 @@ public abstract class ModExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected double undefinedMod(Object leftValue, Object rightValue) {
+    protected double undefinedMod(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue
+    ) {
         return Double.NaN;
     }
 }

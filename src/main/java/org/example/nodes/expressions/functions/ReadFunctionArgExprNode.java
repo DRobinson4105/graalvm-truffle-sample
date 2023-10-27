@@ -5,7 +5,7 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.nodes.expressions.EasyScriptExprNode;
 
-public class ReadFunctionArgExprNode extends EasyScriptExprNode {
+public final class ReadFunctionArgExprNode extends EasyScriptExprNode {
     private final int index;
     private final int depth;
 

@@ -19,7 +19,10 @@ public abstract class SubtractionExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected double undefinedSubtraction(Object leftValue, Object rightValue) {
+    protected double undefinedSubtraction(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue
+    ) {
         return Double.NaN;
     }
 }

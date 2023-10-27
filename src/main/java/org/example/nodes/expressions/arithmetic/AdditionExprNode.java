@@ -9,10 +9,17 @@ import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptTruffleStrings;
 import org.example.EasyScriptTypeSystemGen;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import com.oracle.truffle.api.nodes.Node;
 
 @NodeChild("leftNode")
 @NodeChild("rightNode")
 public abstract class AdditionExprNode extends EasyScriptExprNode {
+    protected static boolean isComplex(Object value) {
+        return !(EasyScriptTypeSystemGen.isImplicitDouble(value) ||
+                EasyScriptTypeSystemGen.isBoolean(value) ||
+                value == Undefined.instance);
+    }
+
     @Specialization(rewriteOn = ArithmeticException.class)
     protected int intAddition(int leftValue, int rightValue) {
         return Math.addExact(leftValue, rightValue);
@@ -23,27 +30,30 @@ public abstract class AdditionExprNode extends EasyScriptExprNode {
         return leftValue + rightValue;
     }
 
+    @Specialization
+    public TruffleString stringConcatenation(
+            TruffleString left, TruffleString right,
+            @Cached TruffleString.ConcatNode concatNode
+    ) {
+        return EasyScriptTruffleStrings.concat(left, right, concatNode);
+    }
+
     @Specialization(guards = "isComplex(left) || isComplex(right)")
-    protected TruffleString objectAsStringConcatenation(Object left, Object right, @Cached TruffleString.FromJavaStringNode fromJavaStringNode) {
+    protected TruffleString objectAsStringConcatenation(
+            Object left, Object right,
+            @Cached TruffleString.FromJavaStringNode fromJavaStringNode
+    ) {
         return EasyScriptTruffleStrings.fromJavaString(
                 EasyScriptTruffleStrings.concatTwoObjects(left, right),
                 fromJavaStringNode
         );
     }
 
-    @Specialization
-    public TruffleString stringConcatenation(TruffleString left, TruffleString right, @Cached TruffleString.ConcatNode concatNode) {
-        return EasyScriptTruffleStrings.concat(left, right, concatNode);
-    }
-
     @Fallback
-    protected double undefinedAddition(@SuppressWarnings("unused") Object leftValue, @SuppressWarnings("unused") Object rightValue) {
+    protected double undefinedAddition(
+            @SuppressWarnings("unused") Object leftValue,
+            @SuppressWarnings("unused") Object rightValue
+    ) {
         return Double.NaN;
-    }
-
-    protected static boolean isComplex(Object value) {
-        return !(EasyScriptTypeSystemGen.isImplicitDouble(value) ||
-                EasyScriptTypeSystemGen.isBoolean(value) ||
-                value == Undefined.instance);
     }
 }

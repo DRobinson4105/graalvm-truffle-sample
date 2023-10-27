@@ -2,7 +2,6 @@ package org.example.nodes.expressions.functions.builtin;
 
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-import org.example.nodes.expressions.functions.builtin.BuiltInFunctionBodyExprNode;
 
 public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNode {
     @Specialization(guards = "exponent >= 0", rewriteOn = ArithmeticException.class)
@@ -21,7 +20,9 @@ public abstract class PowFunctionBodyExprNode extends BuiltInFunctionBodyExprNod
     }
 
     @Fallback
-    protected double nonNumberPow(Object base, Object exponent) {
+    protected double nonNumberPow(
+            @SuppressWarnings("unused") Object base, @SuppressWarnings("unused") Object exponent
+    ) {
         return Double.NaN;
     }
 }

@@ -6,7 +6,7 @@ import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.nodes.statements.EasyScriptStmtNode;
 import com.oracle.truffle.api.profiles.ConditionProfile;
 
-public class IfStmtNode extends EasyScriptStmtNode {
+public final class IfStmtNode extends EasyScriptStmtNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child private EasyScriptExprNode conditionExpr;
     @SuppressWarnings("FieldMayBeFinal")

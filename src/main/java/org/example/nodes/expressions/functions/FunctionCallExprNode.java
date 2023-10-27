@@ -10,17 +10,19 @@ import org.example.nodes.expressions.EasyScriptExprNode;
 import org.example.runtime.FunctionObject;
 import java.util.List;
 
-public class FunctionCallExprNode extends EasyScriptExprNode {
+public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private EasyScriptExprNode targetFunction;
     @Children
     private final EasyScriptExprNode[] callArguments;
-
     @SuppressWarnings("FieldMayBeFinal")
     @Child
     private FunctionDispatchNode dispatchNode;
-    public FunctionCallExprNode(EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments) {
+
+    public FunctionCallExprNode(
+            EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments
+    ) {
         super();
         this.targetFunction = targetFunction;
         this.callArguments = callArguments.toArray(new EasyScriptExprNode[]{});
@@ -33,18 +35,23 @@ public class FunctionCallExprNode extends EasyScriptExprNode {
         Object function = this.targetFunction.executeGeneric(frame);
 
         if (function instanceof FunctionObject functionObject) {
-            int infoVal = 1;
+            int containsEnclosingInfo = 1;
             Object[] argumentValues = new Object[this.callArguments.length + 1];
 
+            // set enclosing frame as the parent frame for closure frames
             if (functionObject.isClosure)
                 argumentValues[0] = functionObject.enclosingFrame;
+
+            // add surrounding truffle object to beginning of frame for method calls
             else if (functionObject.methodTarget != null)
                 argumentValues[0] = functionObject.methodTarget;
+
+            // no enclosing info provided
             else
-                infoVal = 0;
+                containsEnclosingInfo = 0;
 
             for (int i = 0; i < this.callArguments.length; i++)
-                argumentValues[i + infoVal] = this.callArguments[i].executeGeneric(frame);
+                argumentValues[i + containsEnclosingInfo] = this.callArguments[i].executeGeneric(frame);
 
             argumentValues = extendedArguments(argumentValues, functionObject);
 

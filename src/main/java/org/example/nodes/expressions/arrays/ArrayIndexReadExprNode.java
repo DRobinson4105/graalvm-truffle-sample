@@ -10,6 +10,7 @@ import com.oracle.truffle.api.library.CachedLibrary;
 import com.oracle.truffle.js.runtime.objects.Undefined;
 import org.example.EasyScriptException;
 import org.example.nodes.expressions.EasyScriptExprNode;
+import org.example.runtime.ArrayObject;
 
 @NodeChild("arrayExpr")
 @NodeChild("indexExpr")
@@ -27,7 +28,7 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     @Specialization(guards = "interopLibrary.isNull(target)", limit = "1")
-    protected Object indexUndefined(
+    protected Object invalidIndex(
             @SuppressWarnings("unused") Object target, Object index,
             @SuppressWarnings("unused") @CachedLibrary("target") InteropLibrary interopLibrary
     ) {
@@ -35,7 +36,9 @@ public abstract class ArrayIndexReadExprNode extends EasyScriptExprNode {
     }
 
     @Fallback
-    protected Object invalidArrayOrIndex(@SuppressWarnings("unused") Object array, @SuppressWarnings("unused") Object index) {
+    protected Object invalidArray(
+            @SuppressWarnings("unused") Object array, @SuppressWarnings("unused") Object index
+    ) {
         return Undefined.instance;
     }
 }
