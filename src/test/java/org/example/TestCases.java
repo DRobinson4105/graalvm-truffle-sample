@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.example.Main.exportAndOpenAllPackagesToUnnamed;
-import static org.example.TestRunner.runInline;
+import static org.example.TestRunner.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCases {
@@ -52,6 +52,7 @@ public class TestCases {
                 """).asInt()
         );
     }
+
     @Test public void caseString() {
         assertEquals("", runInline("""
                 return "";
@@ -235,6 +236,7 @@ public class TestCases {
                 """).asInt()
         );
     }
+
     @Test public void caseStringProperties() {
         assertEquals("H", runInline("""
                 let str = "Hello";
@@ -626,6 +628,7 @@ public class TestCases {
                """).asBoolean()
         );
     }
+
     @Test public void caseControlFlow() {
         assertEquals(16, runInline("""
                 let i = 1
@@ -752,5 +755,9 @@ public class TestCases {
                 return i
                 """).asInt()
         );
+    }
+
+    @Test public void runTest() {
+        assertEquals(0, runTestFile("code.txt").asInt());
     }
 }

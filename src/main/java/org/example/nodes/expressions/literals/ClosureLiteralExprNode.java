@@ -23,6 +23,6 @@ public final class ClosureLiteralExprNode extends EasyScriptExprNode {
         var truffleLanguage = this.currentTruffleLanguage();
         var funcRootNode = new StmtBlockRootNode(truffleLanguage, this.frameDescriptor, this.funcBody);
         var callTarget = funcRootNode.getCallTarget();
-        return new FunctionObject(callTarget, frame, this.argumentCount);
+        return new FunctionObject(callTarget, this.argumentCount, frame, true);
     }
 }

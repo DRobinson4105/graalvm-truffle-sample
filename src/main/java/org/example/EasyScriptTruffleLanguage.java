@@ -14,9 +14,6 @@ import org.example.runtime.ArrayObject;
 
 import java.util.stream.IntStream;
 
-/**
- *
- */
 @TruffleLanguage.Registration(id = "ezs", name = "EasyScript")
 public final class EasyScriptTruffleLanguage extends
         TruffleLanguage<EasyScriptLanguageContext> {

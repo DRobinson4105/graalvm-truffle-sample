@@ -17,25 +17,22 @@ public final class FunctionObject implements TruffleObject {
     private final FunctionDispatchNode functionDispatchNode;
     public CallTarget callTarget;
     public int argumentCount;
-    public final Object methodTarget;
+    public Object methodTarget;
     public VirtualFrame enclosingFrame;
     public boolean isClosure = false;
 
-    public FunctionObject(CallTarget callTarget, int argumentCount, Object methodTarget) {
-        this.functionDispatchNode = FunctionDispatchNodeGen.create();
+    public FunctionObject(CallTarget callTarget, int argumentCount, Object frameInfo, boolean isClosure) {
+        if (isClosure)
+            this.enclosingFrame = ((VirtualFrame) frameInfo).materialize();
+        else
+            this.methodTarget = frameInfo;
         this.callTarget = callTarget;
         this.argumentCount = argumentCount;
-        this.methodTarget = methodTarget;
-    }
-
-    public FunctionObject(CallTarget callTarget, VirtualFrame enclosingFrame, int argumentCount) {
-        this(callTarget, argumentCount, null);
-        this.enclosingFrame = enclosingFrame.materialize();
-        this.isClosure = true;
+        this.functionDispatchNode = FunctionDispatchNodeGen.create();
     }
 
     public FunctionObject(CallTarget callTarget, int argumentCount) {
-        this(callTarget, argumentCount, null);
+        this(callTarget, argumentCount, null, false);
     }
 
     @ExportMessage

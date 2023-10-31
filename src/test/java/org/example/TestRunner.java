@@ -19,7 +19,7 @@ public class TestRunner {
 
     @SuppressWarnings("unused")
     public static Value runTestFile(String name){
-        String fileName = "/Users/drobinson/IdeaProjects/GraalVMLearning/src/test/java/org/example/" + name;
+        String fileName = "./src/test/java/org/example/code.txt";
         String content;
         try {
             content = new String(Files.readAllBytes(Paths.get(fileName)));

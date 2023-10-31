@@ -5,23 +5,26 @@ import org.openjdk.jmh.annotations.Fork;
 
 public class SimpleBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_EZS_PROGRAM = """
-                var n = 0;
-                var i = 1;
-                const fun = (n) => {
-                
-                while (n != 10000) {
-                    n = n + 1;
+                let i = 0;
+                let j = 0;
+                while (i < 10) {
+                    i = i + 1;
                 }
-                return n;
+                return 1;
+            """;
+
+    private static final String FIBONACCI_EZS_PROGRAM2 = """
+                let i = 0;
+                let j = 0;
+                while (i < 10) {
+                    i = i + 1;
+                    j = j + 1;
                 }
-                return fun(n)
+                return 1;
             """;
     private static final String FIBONACCI_JS_PROGRAM = """
-                var n = 0;
-                while (n != 10000) {
-                    n = n + 1;
-                }
-                n;
+                var i = 1;
+                1;
             """;
 
     @Benchmark
@@ -29,8 +32,13 @@ public class SimpleBenchmark extends TruffleBenchmark {
         return this.truffleContext.eval("ezs", FIBONACCI_EZS_PROGRAM).asInt();
     }
 
-//    @Benchmark
-    public int recursive_js_eval() {
-        return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();
+    @Benchmark
+    public int recursive_ezs_eval2() {
+        return this.truffleContext.eval("ezs", FIBONACCI_EZS_PROGRAM2).asInt();
     }
+
+//    @Benchmark
+//    public int recursive_js_eval() {
+//        return this.truffleContext.eval("js", FIBONACCI_JS_PROGRAM).asInt();
+//    }
 }

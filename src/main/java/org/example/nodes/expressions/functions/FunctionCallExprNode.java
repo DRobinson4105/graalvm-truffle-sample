@@ -12,13 +12,11 @@ import java.util.List;
 
 public final class FunctionCallExprNode extends EasyScriptExprNode {
     @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private EasyScriptExprNode targetFunction;
-    @Children
-    private final EasyScriptExprNode[] callArguments;
+    @Child private EasyScriptExprNode targetFunction;
     @SuppressWarnings("FieldMayBeFinal")
-    @Child
-    private FunctionDispatchNode dispatchNode;
+    @Children private EasyScriptExprNode[] callArguments;
+    @SuppressWarnings("FieldMayBeFinal")
+    @Child private FunctionDispatchNode dispatchNode;
 
     public FunctionCallExprNode(
             EasyScriptExprNode targetFunction, List<EasyScriptExprNode> callArguments
@@ -39,7 +37,7 @@ public final class FunctionCallExprNode extends EasyScriptExprNode {
             Object[] argumentValues = new Object[this.callArguments.length + 1];
 
             // set enclosing frame as the parent frame for closure frames
-            if (functionObject.isClosure)
+            if (functionObject.enclosingFrame != null)
                 argumentValues[0] = functionObject.enclosingFrame;
 
             // add surrounding truffle object to beginning of frame for method calls
