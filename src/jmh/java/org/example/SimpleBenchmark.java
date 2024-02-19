@@ -1,7 +1,6 @@
 package org.example;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
 
 public class SimpleBenchmark extends TruffleBenchmark {
     private static final String FIBONACCI_EZS_PROGRAM = """

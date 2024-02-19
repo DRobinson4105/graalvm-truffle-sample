@@ -26,9 +26,10 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    val jmhVersion = "1.36"
+    val jmhVersion = "1.37"
     jmh("org.openjdk.jmh:jmh-core:${jmhVersion}")
     jmh("org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}")
+    jmh("org.openjdk.jmh:jmh-generator-bytecode:${jmhVersion}")
     jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}")
 
     val apacheVersion = "1.10.0"
